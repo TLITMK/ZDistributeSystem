@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('nickname', 32)->comment('昵称');
             $table->unsignedTinyInteger('gender')->default(3)->comment('性别 1 男 2 女 3 未知');
+            $table->tinyInteger('developer')->default(0)->comment('超管开发者 1是 0不是');
             $table->string('avatar', 128)->nullable();
             $table->string('email')->unique();
             $table->string('signature')->nullable();

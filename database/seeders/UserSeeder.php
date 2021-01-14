@@ -28,6 +28,7 @@ class UserSeeder extends Seeder
             'signature' => '虚幻之物对应着冥冥之路。',
             'email_verified_at' => now(),
             'remember_token' => Str::random(10),
+            'developer'=>1
         ];
         User::create($data);
         User::factory(10)->create();

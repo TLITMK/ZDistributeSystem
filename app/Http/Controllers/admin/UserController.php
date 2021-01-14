@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
@@ -49,8 +50,13 @@ class UserController extends Controller
     public function userInfo(Request $request)
     {
         $user = $request->user();
-
-        $user->menus=$this->getMenu($user->getAllPermissions());
+        if($user->developer){
+            $permission=Permission::with('roles')->get();
+        }
+        else{
+            $permission=$user->getAllPermissions();
+        }
+        $user->menus=$this->getMenu($permission);
 
         return response()->json($user, 200);
     }
