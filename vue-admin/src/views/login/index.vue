@@ -52,9 +52,6 @@
         {{ $t('login.logIn') }}
       </el-button>
 
-      <el-button @click="testUserInfo()">
-        测试userinfo2
-      </el-button>
 
       <div style="position:relative">
         <div class="tips">
@@ -138,6 +135,7 @@ export default {
   },
   created() {
     // window.addEventListener('storage', this.afterQRScan)
+    window.console.log('login')
   },
   mounted() {
     if (this.loginForm.username === '') {
