@@ -1,12 +1,14 @@
 <template>
     <div class="app-container">
-        <router-view/>
+        <el-button type="primary" >
+            third one
+        </el-button>
     </div>
 </template>
 
 <script>
     export default {
-        name: "permission.index"
+        name: "test.third.one"
     }
 </script>
 
