@@ -82,3 +82,19 @@
 .el-range-separator {
   box-sizing: content-box;
 }
+
+.drawer__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+}
+.drawer__footer {
+  display: flex;
+}
+.drawer__content form {
+  flex: 1;
+}
+.drawer__footer button {
+  flex: 1;
+}
