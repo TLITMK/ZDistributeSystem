@@ -10,7 +10,8 @@ return [
     | Requests from the following domains / hosts will receive stateful API
     | authentication cookies. Typically, these should include your local
     | and production domains which access your API via a frontend SPA.
-    |
+    来自以下域/主机的请求将接收到有状态API身份验证cookie。
+    通常，这些域应该包括通过前端SPA访问API的本地域和生产域。
     */
 
 //    'stateful' => explode(',', env(
