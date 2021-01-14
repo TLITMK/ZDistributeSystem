@@ -31,18 +31,24 @@ module.exports = {
   productionSourceMap: false,
   //mock模拟数据
   devServer: {
-    port: port,
-    open: true,
+    port: port,//端口
+    open: false,//自动打开浏览器
     overlay: {
       warnings: false,
       errors: true
     },
-    proxy:{
+    hot:true,//修改自动编译
+    headers: {
+      'Access-Control-Allow-Origin': '*',     //允许所有域名访问
+      'Access-Control-Allow-Credentials': 'true' //是否允许后续请求携带认证信息（cookies）,该值只能是true,否则不返回
+    },
+    proxy:{//代理
       [process.env.VUE_APP_BASE_API]:{
-        target:'http://ds.net:80',
+        target:'http://localhost/admin/api',//后端接口
         changeOrigin:true,
+        secure:false,//是否https
         pathRewrite:{
-          ['^'+process.env.VUE_APP_BASE_API]:''
+          ['^'+process.env.VUE_APP_BASE_API]:''//pathRewrite是使用proxy进行代理时，对请求路径进行重定向以匹配到正确的请求地址
         }
       }
     },
