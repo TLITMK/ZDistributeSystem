@@ -53,7 +53,7 @@
       </el-button>
 
       <el-button @click="testUserInfo()">
-        测试userinfo
+        测试userinfo2
       </el-button>
 
       <div style="position:relative">
