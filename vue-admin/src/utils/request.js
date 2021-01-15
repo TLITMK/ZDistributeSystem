@@ -2,6 +2,29 @@ import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import {Loading} from "element-ui";
+
+//LOADING
+let loading;
+let loadingNum=0;
+function startLoading(){
+  if(loadingNum===0){
+    loading=Loading.service({
+      lock:true,
+      text:'拼命加载中...',
+      background:'rgba(255,255,255,0.5)'
+    })
+  }
+  loadingNum++;
+}
+
+function endLoading(){
+  loadingNum--;
+  if(loadingNum<=0){
+    loading.close();
+  }
+}
+
 
 // create an axios instance
 const service = axios.create({
@@ -14,7 +37,7 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     // do something before request is sent
-
+    startLoading();
     if (store.getters.token) {
       // let each request carry token
       // ['X-Token'] is a custom headers key
@@ -43,9 +66,11 @@ service.interceptors.response.use(
      * You can also judge the status by HTTP Status Code
      */
     response => {
+      endLoading();
       return response.data
     },
     error => {
+      endLoading();
       console.log('err' + error) // for debug
       if (error.response && error.response.status == 401) {
         store.dispatch('logout');
