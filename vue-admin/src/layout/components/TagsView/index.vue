@@ -42,6 +42,10 @@ export default {
     }
   },
   computed: {
+
+    theme() {
+      return this.$store.state.settings.theme
+    },
     visitedViews() {
       return this.$store.state.tagsView.visitedViews
     },
@@ -227,9 +231,9 @@ export default {
         margin-right: 15px;
       }
       &.active {
-        background-color: #42b983;
+        background-color: #535356;
         color: #fff;
-        border-color: #42b983;
+        border-color: #535356;
         &::before {
           content: '';
           background: #fff;
