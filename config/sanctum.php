@@ -14,11 +14,11 @@ return [
     通常，这些域应该包括通过前端SPA访问API的本地域和生产域。
     */
 
-//    'stateful' => explode(',', env(
-//        'SANCTUM_STATEFUL_DOMAINS',
-//        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1'
-//    )),
-'stateful'=>[env('SANCTUM_STATEFUL_DOMAINS','localhost'),'localhost:81'],
+    'stateful' => explode(',', env(
+        'SANCTUM_STATEFUL_DOMAINS',
+        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1,ds.net'
+    )),
+//'stateful'=>[env('SANCTUM_STATEFUL_DOMAINS','localhost'),'localhost:8080','127.0.0.1:80'],
 
     /*
     |--------------------------------------------------------------------------
