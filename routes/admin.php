@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\admin\PermissionController;
+use App\Http\Controllers\admin\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,10 @@ Route::group([
     Route::post('user/admin_edit',[UserController::class,'admin_edit'])->name('permission.admin_edit');
     Route::post('user/admin_del',[UserController::class,'admin_del'])->name('permission.admin_del');
     Route::post('user/admin_upload_avatar',[UserController::class,'admin_upload_avatar'])->name('permission.admin_upload_avatar');
+
+    Route::post('role/list',[RoleController::class,'getList'])->name('role.index');
+    Route::post('role/edit',[RoleController::class,'edit'])->name('role.edit');
+    Route::post('role/del',[RoleController::class,'del'])->name('role.del');
 
 
 

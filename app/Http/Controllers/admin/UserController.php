@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
@@ -101,11 +102,18 @@ class UserController extends Controller
         $id=$request->input('id',false);
         if($id){
             //修改
-            $request->validate([
-                'account'=>'required|max:18|min:6',
-                'nickname'=>'required|max:12',
-                'email'=>'required|email'
-            ]);
+            try{
+                $request->validate([
+                    'account'=>'required|max:18|min:6',
+                    'nickname'=>'required|max:12',
+                    'email'=>'required|email'
+                ]);
+            }catch (ValidationException $e){
+                return response()->json([
+                    'err_code'=>200,
+                    'msg'=>$this->ValidateMsg($e)
+                ]);
+            }
             try{
                 $rt=\DB::table('users')->where('id',$id)->update([
                     'account'=>$request->input('account'),
@@ -132,12 +140,20 @@ class UserController extends Controller
         }
         else{
             //插入
-            $request->validate([
-                'account'=>'required|max:18|min:6',
-                'nickname'=>'required|max:12',
-                'email'=>'required|email',
-                'password'=>'required|max:18|min:6'
-            ]);
+            try{
+
+                $request->validate([
+                    'account'=>'required|max:18|min:6',
+                    'nickname'=>'required|max:12',
+                    'email'=>'required|email',
+                    'password'=>'required|max:18|min:6'
+                ]);
+            }catch (ValidationException $e){
+                return response()->json([
+                    'err_code'=>200,
+                    'msg'=>$this->ValidateMsg($e)
+                ]);
+            }
             try{
                 $faker = \Faker\Factory::create('zh_CN');
                 $rt=\DB::table('users')->where('id',$id)->insert([

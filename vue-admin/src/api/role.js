@@ -7,32 +7,27 @@ export function getRoutes() {
   })
 }
 
-export function getRoles() {
+export function getRoles(params) {
   return request({
-    url: '/vue-element-admin/roles',
-    method: 'get'
-  })
-}
-
-export function addRole(data) {
-  return request({
-    url: '/vue-element-admin/role',
+    url: '/role/list',
     method: 'post',
-    data
+    data:params
   })
 }
 
-export function updateRole(id, data) {
+export function editRoles(params){
   return request({
-    url: `/vue-element-admin/role/${id}`,
-    method: 'put',
-    data
+    url:'/role/edit',
+    method:'post',
+    data:params
   })
 }
 
-export function deleteRole(id) {
+
+export function deleteRole(params) {
   return request({
-    url: `/vue-element-admin/role/${id}`,
-    method: 'delete'
+    url: '/role/del',
+    method: 'post',
+    data:params
   })
 }
