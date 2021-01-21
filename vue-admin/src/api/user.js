@@ -30,10 +30,11 @@ export function csrfCookie(){
   })
 }
 
-export function user_admin_list(){
+export function user_admin_list(params){
   return request({
     url:'/user/admin_list',
-    method:'post'
+    method:'post',
+    data:params
   })
 }
 

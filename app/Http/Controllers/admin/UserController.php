@@ -85,8 +85,9 @@ class UserController extends Controller
     }
 
     public function admin_list(Request $request){
-        $list=User::get()->toArray();
-        return $list;
+        $count=$request->input('pageSize',10);
+        $list=User::paginate($count);
+        return response()->json($list);
     }
 
     public function admin_edit(Request $request){

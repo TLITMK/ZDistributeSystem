@@ -6,7 +6,7 @@
         <!--        table-->
 
         <el-table
-                :data="tableData"
+                :data="tableData.data"
                 style="width: 100%;margin-bottom: 20px;"
                 row-key="id"
                 border
@@ -72,19 +72,19 @@
                     width="120">
                 <template slot-scope="scope">
                     <el-button
-                            @click.native.prevent="deleteRow(scope, tableData)"
+                            @click.native.prevent="deleteRow(scope, tableData.data)"
                             type="text"
                             size="small">
                         删除
                     </el-button>
                     <el-button
-                            @click.native.prevent="addRow(scope, tableData)"
+                            @click.native.prevent="addRow(scope, tableData.data)"
                             type="text"
                             size="small">
                         添加
                     </el-button>
                     <el-button
-                            @click.native.prevent="editRow(scope, tableData)"
+                            @click.native.prevent="editRow(scope, tableData.data)"
                             type="text"
                             size="small">
                         编辑
@@ -93,6 +93,17 @@
                 </template>
             </el-table-column>
         </el-table>
+        <div class="block" style="float: right;">
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="tableData.currentPage"
+                    :page-sizes="[10, 20, 50, 100]"
+                    :page-size="tableData.per_page"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="tableData.total">
+            </el-pagination>
+        </div>
 
         <!--        抽屉
         direction rtl / ltr / ttb / btt
@@ -197,12 +208,21 @@
            }
        },
         created(){
-            user_admin_list().then(res=>{
-                this.tableData=res;
-                //this.tableData=this.getMenu(res)
-            })
+            this.getList(1,20);
         },
         methods:{
+            handleSizeChange(val) {
+                this.getList(this.tableData.currentPage,val)
+            },
+            handleCurrentChange(val) {
+                this.getList(val,this.tableData.per_page)
+            },
+            getList(page,pageSize){
+                user_admin_list({page:page,pageSize:pageSize}).then(res=>{
+                    this.tableData=res;
+                })
+            },
+
             //图片
 
             handleAvatarSuccess(res, file) {
@@ -246,17 +266,7 @@
             },
 
 
-            ///
-            append(data) {
-                this.selected_node=data;
-            },
 
-            remove(node, data) {
-                const parent = node.parent;
-                const children = parent.data.children || parent.data;
-                const index = children.findIndex(d => d.id === data.id);
-                children.splice(index, 1);
-            },
             deleteRow(row,data) {
                 console.log(row)
                 console.log(row.row)
@@ -269,9 +279,7 @@
                                     message:res.msg,
                                     type:'success'
                                 })
-                                user_admin_list().then(res=>{
-                                    this.tableData=res
-                                })
+                                this.getList(1,15)
                                 // const parent = row.row.parent;
                                 // const children = parent.children;
                                 // const index = children.findIndex(d => d.id === data.id);
@@ -311,20 +319,6 @@
 
                 this.dialog=true;
             },
-            getMenu(permissions,parent_id=0,parent=null){
-                var _this=this;
-                var arr=[];
-                permissions.forEach((v,k)=>{
-                    if(v.parent_id===parent_id){
-                        v.children=_this.getMenu(permissions,v.id,v);
-                        v.parent=[];
-                        v.parent.push(parent)
-                        arr.push(v)
-                    }
-                })
-
-                return arr;
-            },
 
             handleClose(done) {
                 if (this.loading) {
@@ -354,9 +348,7 @@
                                     message: res.msg,
                                     type: 'success'
                                 });
-                                user_admin_list().then(res=>{
-                                    this.tableData=res
-                                })
+                                this.getList(1,15)
                             }
                             else{
                                 this.$message.error(res.msg);
