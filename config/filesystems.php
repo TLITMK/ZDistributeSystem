@@ -41,6 +41,14 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+        'avatar'=>[
+            'driver'=>'local',
+            // 文件将上传到storage/app/uploads目录
+             'root' => storage_path('app/public/avatar'),
+
+            // 文件将上传到public/img 如果需要浏览器直接访问 请设置成这个
+//            'root' => public_path('avatar'),
+        ],
 
         's3' => [
             'driver' => 's3',
@@ -66,7 +74,7 @@ return [
     */
 
     'links' => [
-        public_path('storage') => storage_path('app/public'),
+        public_path('storage') => storage_path('app/public')
     ],
 
 ];

@@ -21,6 +21,8 @@ Route::group([
     Route::post('permission/del',[PermissionController::class,'permission_del'])->name('permission.del');
 
     Route::post('user/admin_list',[UserController::class,'admin_list'])->name('permission.admin_list');
+    Route::post('user/admin_edit',[UserController::class,'admin_edit'])->name('permission.admin_edit');
+    Route::post('user/admin_upload_avatar',[UserController::class,'admin_upload_avatar'])->name('permission.admin_upload_avatar');
 
 
 

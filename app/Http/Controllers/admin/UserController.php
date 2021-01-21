@@ -8,6 +8,10 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
@@ -78,5 +82,114 @@ class UserController extends Controller
         $user=User::first();
         $user->menus=$this->getMenu($user->getAllPermissions());
         return response()->json($user,200);
+    }
+
+    public function admin_list(Request $request){
+        $list=User::get()->toArray();
+        return $list;
+    }
+
+    public function admin_edit(Request $request){
+
+        $id=$request->input('id',false);
+        if($id){
+            //修改
+            $request->validate([
+                'account'=>'required|max:18|min:6',
+                'nickname'=>'required|max:12',
+                'email'=>'required|email'
+            ]);
+            try{
+                $avatar=$request->input('avatar_file',false);
+                if($avatar){
+                   //保存头像
+                    dd($request->file('avatar_file'));
+                }else{
+                    $faker = \Faker\Factory::create('zh_CN');
+                    $avatar=$faker->imageUrl(256,256);
+                }
+                $rt=\DB::table('users')->where('id',$id)->update([
+                    'account'=>$request->input('account'),
+                    'nickname'=>$request->input('nickname','用户#'.random_bytes(5)),
+                    'gender'=>$request->input('gender',3),
+                    'developer'=>$request->input('developer',0),
+                    'avatar'=>$avatar,
+                    'email'=>$request->input('email'),
+                    'signature'=>$request->input('signature',''),
+                    'updated_at'=>date('Y-m-d H:i:s'),
+                    'email_verified_at'=>null
+
+                ]);
+            }catch(\Throwable $e){
+                return response()->json([
+                    'err_code'=>500,
+                    'msg'=>$e->getMessage(),
+                    'data'=>$e->getTrace()
+                ]);
+            }
+            return response()->json([
+                'err_code'=>0,
+                'msg'=>'修改成功'
+            ]);
+
+        }
+        else{
+            //插入
+            $request->validate([
+                'account'=>'required|max:18|min:6',
+                'nickname'=>'required|max:12',
+                'email'=>'required|email'
+            ]);
+            try{
+                $faker = \Faker\Factory::create('zh_CN');
+                $rt=\DB::table('users')->where('id',$id)->insert([
+                    'account'=>$request->input('account'),
+                    'nickname'=>$request->input('nickname','用户#'.random_bytes(5)),
+                    'gender'=>$request->input('gender',3),
+                    'developer'=>$request->input('developer',0),
+                    'avatar'=>$request->input('avatar', $faker->imageUrl(256,256)),
+                    'email'=>$request->input('email'),
+                    'signature'=>$request->input('signature',''),
+                    'created_at'=>date('Y-m-d H:i:s'),
+                    'email_verified_at'=>null
+
+                ]);
+            }catch(\Throwable $e){
+                return response()->json([
+                    'err_code'=>500,
+                    'msg'=>$e->getMessage(),
+                    'data'=>$e->getTrace()
+                ]);
+            }
+            return response()->json([
+                'err_code'=>0,
+                'msg'=>'添加成功'
+            ]);
+        }
+    }
+    public function admin_upload_avatar(Request $request){
+        $files=$request->allFiles();
+        $user_id=$request->input('uid');
+        $base64=$request->input('file');
+//        $request->validate([
+//            'file'=>'image|required|mimes:jpg,png',
+//        ]);
+        $bool=Storage::disk('avatar')->put($user_id.'.png',base64_decode(explode(',',$base64)[1]));
+        if(!$bool){
+            return response()->json([
+                'err_code'=>500,
+                'msg'=>'上传失败'
+            ]);
+        }
+        $path=$request->server('REQUEST_SCHEME').'://'.$request->server('HTTP_HOST').Storage::url('avatar/'.$user_id.'.png');
+        \DB::table('users')->where('id',$user_id)
+            ->update([
+                'avatar'=>$path
+            ]);
+        return response()->json([
+            'err_code'=>0,
+            'msg'=>'上传成功',
+            'data'=>$path
+        ]);
     }
 }
