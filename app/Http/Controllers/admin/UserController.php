@@ -100,24 +100,14 @@ class UserController extends Controller
                 'email'=>'required|email'
             ]);
             try{
-                $avatar=$request->input('avatar_file',false);
-                if($avatar){
-                   //保存头像
-                    dd($request->file('avatar_file'));
-                }else{
-                    $faker = \Faker\Factory::create('zh_CN');
-                    $avatar=$faker->imageUrl(256,256);
-                }
                 $rt=\DB::table('users')->where('id',$id)->update([
                     'account'=>$request->input('account'),
                     'nickname'=>$request->input('nickname','用户#'.random_bytes(5)),
                     'gender'=>$request->input('gender',3),
                     'developer'=>$request->input('developer',0),
-                    'avatar'=>$avatar,
                     'email'=>$request->input('email'),
                     'signature'=>$request->input('signature',''),
-                    'updated_at'=>date('Y-m-d H:i:s'),
-                    'email_verified_at'=>null
+                    'updated_at'=>date('Y-m-d H:i:s')
 
                 ]);
             }catch(\Throwable $e){
@@ -138,7 +128,8 @@ class UserController extends Controller
             $request->validate([
                 'account'=>'required|max:18|min:6',
                 'nickname'=>'required|max:12',
-                'email'=>'required|email'
+                'email'=>'required|email',
+                'password'=>'required|max:18|min:6'
             ]);
             try{
                 $faker = \Faker\Factory::create('zh_CN');
@@ -151,6 +142,7 @@ class UserController extends Controller
                     'email'=>$request->input('email'),
                     'signature'=>$request->input('signature',''),
                     'created_at'=>date('Y-m-d H:i:s'),
+                    'password'=>Hash::make($request->input('password')),
                     'email_verified_at'=>null
 
                 ]);
@@ -167,6 +159,31 @@ class UserController extends Controller
             ]);
         }
     }
+
+    public function admin_del(Request $request){
+        $id=$request->input('id');
+        if(!$id){
+            return response()->json([
+                'err_code'=>200,
+                'msg'=>'参数错误',
+                'data'=>''
+            ]);
+        }
+        try{
+            \DB::table('users')->where('id',$id)->delete();
+        }catch (\Throwable $e){
+            return response()->json([
+                'err_code'=>500,
+                'msg'=>$e->getMessage(),
+                'data'=>$e->getTrace()
+            ]);
+        }
+        return response()->json([
+            'err_code'=>0,
+            'msg'=>'删除成功'
+        ]);
+    }
+
     public function admin_upload_avatar(Request $request){
         $files=$request->allFiles();
         $user_id=$request->input('uid');

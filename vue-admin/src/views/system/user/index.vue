@@ -115,7 +115,7 @@
                     <el-form-item label="账号" >
                         <el-input v-model="form.account" placeholder="不可为空" autocomplete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="密码" >
+                    <el-form-item label="密码" v-if='isCreate'>
                         <el-input v-model="form.password" placeholder="不可为空" autocomplete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="头像" >
@@ -167,7 +167,7 @@
     </div>
 </template>
 <script>
-   import {user_admin_list,user_admin_edit,user_admin_upload_avatar} from "../../../api/user";
+   import {user_admin_list,user_admin_edit,user_admin_upload_avatar,user_admin_del} from "../../../api/user";
 
    export default {
         name: "permission.index",
@@ -185,7 +185,8 @@
                 //图片
                 dialogImageUrl: '',
                 dialogVisible: false,
-                disabled: false
+                disabled: false,
+                isCreate:false,
             }
         },
        computed: {
@@ -221,11 +222,8 @@
                     return false;
                 }
 
-                let temp=file;
-                this.form.avatar_file=file;
-                this.form.avatar=file.url;
                 var reader=new FileReader();
-                reader.readAsDataURL(temp);
+                reader.readAsDataURL(file);
                 reader.onload = () => {
                     this.form.avatar = reader.result
                     let fd=new FormData();
@@ -263,18 +261,21 @@
                 console.log(row)
                 console.log(row.row)
                 // return;
-                this.$confirm('确定要删除 【'+row.row.title+'】 权限吗？')
+                this.$confirm('确定要删除 【'+row.row.nickname+'】 吗？')
                     .then(_ => {
-                        permission_del({id:row.row.id}).then(res=>{
+                        user_admin_del({id:row.row.id}).then(res=>{
                             if(res.err_code===0){
                                 this.$message({
                                     message:res.msg,
                                     type:'success'
                                 })
-                                const parent = row.row.parent;
-                                const children = parent.children;
-                                const index = children.findIndex(d => d.id === data.id);
-                                children.splice(index, 1);
+                                user_admin_list().then(res=>{
+                                    this.tableData=res
+                                })
+                                // const parent = row.row.parent;
+                                // const children = parent.children;
+                                // const index = children.findIndex(d => d.id === data.id);
+                                // children.splice(index, 1);
 
                             }
                             else{
@@ -291,6 +292,7 @@
             },
             addRow(row) {
                 this.drawerTitle='添加'
+                this.isCreate=true;
                 this.form={
                     parent_id:row.row.id,
                     guard_name:'web',
@@ -303,6 +305,7 @@
             },
             editRow(row){
                 this.drawerTitle='编辑'
+                this.isCreate=false;
                 this.form=row.row;
                 console.log(this.form)
 

@@ -45,6 +45,14 @@ export function user_admin_edit(params){
   })
 }
 
+export function user_admin_del(params){
+  return request({
+    url:'/user/admin_del',
+    method:'post',
+    params:params
+  })
+}
+
 export function user_admin_upload_avatar(params){
   let config = {
     headers: {
