@@ -86,7 +86,13 @@ class UserController extends Controller
 
     public function admin_list(Request $request){
         $count=$request->input('pageSize',10);
-        $list=User::paginate($count);
+        $list=User::where(function($query)use($request){
+            $searchType=$request->input('searchType','account');
+            $searchValue=$request->input('searchValue',false);
+            if($searchValue&&$searchType)
+                $query->where($searchType,'like','%'.$searchValue.'%');
+
+        })->paginate($count);
         return response()->json($list);
     }
 

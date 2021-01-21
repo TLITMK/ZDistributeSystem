@@ -1,109 +1,121 @@
 <template>
-    <div class="app-container">
-
-
-
+    <el-container>
+        <el-header>
+            <h1>用户管理</h1>
+        </el-header>
         <!--        table-->
+        <el-main>
+            <div class="block">
+                <el-input placeholder="请输入内容" v-model="searchValue"  style="width:50%" clearable @clear="searchClear">
+                    <el-select v-model="searchType" style="width: 100px;" slot="prepend" placeholder="请选择">
+                        <el-option label="账号" value="account">账号</el-option>
+                        <el-option label="邮箱" value="email">邮箱</el-option>
+                        <el-option label="昵称" value="nickname">昵称</el-option>
+                    </el-select>
+                    <el-button slot="append" icon="el-icon-search" @click="getList(tableData.currentPage,tableData.per_page)"></el-button>
+                </el-input>
+            </div>
+            <el-table
+                    :data="tableData.data"
+                    style="width: 100%;margin-bottom: 20px;"
+                    row-key="id"
+                    border
+            >
 
-        <el-table
-                :data="tableData.data"
-                style="width: 100%;margin-bottom: 20px;"
-                row-key="id"
-                border
-                >
+                <el-table-column
+                        label="头像" width="60" fixed="left">
+                    <template slot-scope="scope">
+                        <div class="avatar-container">
+                            <div class="avatar-wrapper el-dropdown-selfdefine">
 
-            <el-table-column
-                    label="头像" width="60" fixed="left">
-                <template slot-scope="scope">
-                    <div class="avatar-container">
-                        <div class="avatar-wrapper el-dropdown-selfdefine">
+                                <img class="user-avatar" fit="cover" :src="scope.row.avatar" alt="" />
 
-                            <img class="user-avatar" fit="cover" :src="scope.row.avatar" alt="" />
-
+                            </div>
                         </div>
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column
-                    fixed="left"
-                    prop="nickname"
-                    label="姓名"
-                    width="120"
-                    sortable>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        fixed="left"
+                        prop="nickname"
+                        label="姓名"
+                        width="120"
+                        sortable>
 
-            </el-table-column>
-            <el-table-column
-                    prop="account"
-                    label="账号"
-                    width="120"
-                    sortable>
-            </el-table-column>
-            <el-table-column
-                    prop="email"
-                    label="邮箱"
-                    width="120"
-                    sortable>
-            </el-table-column>
-            <el-table-column
-                    prop="gender"
-                    label="性别"
-                    width="60"
-                    sortable>
-                <template slot-scope="scope">{{scope.row.gender===1?'男':scope.row.gender===2?'女':'未知'}}</template>
-            </el-table-column>
-            <el-table-column
-                    prop="developer"
-                    label="开发者"
-                    width="60"
-                    sortable>
-                <template slot-scope="scope">
-                    {{scope.row.developer?'是':'否'}}
-                </template>
-            </el-table-column>
+                </el-table-column>
+                <el-table-column
+                        prop="account"
+                        label="账号"
+                        width="120"
+                        sortable>
+                </el-table-column>
+                <el-table-column
+                        prop="email"
+                        label="邮箱"
+                        width="120"
+                        sortable>
+                </el-table-column>
+                <el-table-column
+                        prop="gender"
+                        label="性别"
+                        width="60"
+                        sortable>
+                    <template slot-scope="scope">{{scope.row.gender===1?'男':scope.row.gender===2?'女':'未知'}}</template>
+                </el-table-column>
+                <el-table-column
+                        prop="developer"
+                        label="开发者"
+                        width="60"
+                        sortable>
+                    <template slot-scope="scope">
+                        {{scope.row.developer?'是':'否'}}
+                    </template>
+                </el-table-column>
 
-            <el-table-column
-                    prop="signature"
-                    label="签名"
-                    sortable>
-            </el-table-column>
-            <el-table-column
-                    fixed="right"
-                    label="操作"
-                    width="120">
-                <template slot-scope="scope">
-                    <el-button
-                            @click.native.prevent="deleteRow(scope, tableData.data)"
-                            type="text"
-                            size="small">
-                        删除
-                    </el-button>
-                    <el-button
-                            @click.native.prevent="addRow(scope, tableData.data)"
-                            type="text"
-                            size="small">
-                        添加
-                    </el-button>
-                    <el-button
-                            @click.native.prevent="editRow(scope, tableData.data)"
-                            type="text"
-                            size="small">
-                        编辑
-                    </el-button>
+                <el-table-column
+                        prop="signature"
+                        label="签名"
+                        sortable>
+                </el-table-column>
+                <el-table-column
+                        fixed="right"
+                        label="操作"
+                        width="120">
+                    <template slot-scope="scope">
+                        <el-button
+                                @click.native.prevent="deleteRow(scope, tableData.data)"
+                                type="text"
+                                size="small">
+                            删除
+                        </el-button>
+                        <el-button
+                                @click.native.prevent="addRow(scope, tableData.data)"
+                                type="text"
+                                size="small">
+                            添加
+                        </el-button>
+                        <el-button
+                                @click.native.prevent="editRow(scope, tableData.data)"
+                                type="text"
+                                size="small">
+                            编辑
+                        </el-button>
 
-                </template>
-            </el-table-column>
-        </el-table>
-        <div class="block" style="float: right;">
-            <el-pagination
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
-                    :current-page="tableData.currentPage"
-                    :page-sizes="[10, 20, 50, 100]"
-                    :page-size="tableData.per_page"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="tableData.total">
-            </el-pagination>
-        </div>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="block" style="float: right;">
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="tableData.currentPage"
+                        :page-sizes="[10, 20, 50, 100]"
+                        :page-size="tableData.per_page"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="tableData.total">
+                </el-pagination>
+            </div>
+        </el-main>
+        <el-footer></el-footer>
 
         <!--        抽屉
         direction rtl / ltr / ttb / btt
@@ -175,7 +187,7 @@
             </div>
         </el-drawer>
 
-    </div>
+    </el-container>
 </template>
 <script>
    import {user_admin_list,user_admin_edit,user_admin_upload_avatar,user_admin_del} from "../../../api/user";
@@ -198,6 +210,8 @@
                 dialogVisible: false,
                 disabled: false,
                 isCreate:false,
+                searchType:'account',
+                searchValue:''
             }
         },
        computed: {
@@ -211,6 +225,10 @@
             this.getList(1,20);
         },
         methods:{
+            searchClear(){
+                this.searchValue=''
+                this.getList(this.tableData.currentPage,this.tableData.per_page)
+            },
             handleSizeChange(val) {
                 this.getList(this.tableData.currentPage,val)
             },
@@ -218,7 +236,13 @@
                 this.getList(val,this.tableData.per_page)
             },
             getList(page,pageSize){
-                user_admin_list({page:page,pageSize:pageSize}).then(res=>{
+                let params={
+                    page:page,
+                    pageSize:pageSize,
+                    searchType: this.searchType,
+                    searchValue: this.searchValue
+                }
+                user_admin_list(params).then(res=>{
                     this.tableData=res;
                 })
             },

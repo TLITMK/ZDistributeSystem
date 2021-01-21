@@ -1,101 +1,105 @@
 <template>
-    <div class="app-container">
+    <el-container>
+        <el-header><h1>权限管理</h1></el-header>
+        <el-main>
+            <!--        table  -->
+
+            <el-table
+                    height=""
+                    :data="tableData"
+                    style="width: 100%;margin-bottom: 20px;"
+                    row-key="id"
+                    border
+                    default-expand-all
+                    :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+
+                <el-table-column
+                        fixed=""
+                        prop="title"
+                        label="title"
+                        width="180"
+                        sortable>
+                </el-table-column>
 
 
+                <el-table-column
+                        prop="path"
+                        label="path"
+                        sortable
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="name"
+                        label="name"
+                        sortable
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="component"
+                        label="component"
+                        sortable
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="guard_name"
+                        label="guard_name"
+                        sortable
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="id"
+                        label="id"
+                        sortable>
+                </el-table-column>
+                <el-table-column
+                        prop="parent_id"
+                        label="parent_id"
+                        sortable>
+                </el-table-column>
 
-<!--        table-->
+                <el-table-column
+                        prop="icon"
+                        label="icon"
+                        sortable
+                        width="180">
+                </el-table-column>
 
-        <el-table
-                :data="tableData"
-                style="width: 100%;margin-bottom: 20px;"
-                row-key="id"
-                border
-                default-expand-all
-                :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+                <el-table-column
+                        prop="hidden"
+                        label="hidden"
+                        sortable
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        fixed="right"
+                        label="操作"
+                        width="120">
+                    <template slot-scope="scope">
+                        <el-button
+                                @click.native.prevent="deleteRow(scope, tableData)"
+                                type="text"
+                                size="small">
+                            删除
+                        </el-button>
+                        <el-button
+                                @click.native.prevent="addRow(scope, tableData)"
+                                type="text"
+                                size="small">
+                            添加
+                        </el-button>
+                        <el-button
+                                @click.native.prevent="editRow(scope, tableData)"
+                                type="text"
+                                size="small">
+                            编辑
+                        </el-button>
 
-            <el-table-column
-                    fixed=""
-                    prop="title"
-                    label="title"
-                    width="180"
-                    sortable>
-            </el-table-column>
-            <el-table-column
-                    prop="id"
-                    label="id"
-                    sortable>
-            </el-table-column>
-            <el-table-column
-                    prop="parent_id"
-                    label="parent_id"
-                    sortable>
-            </el-table-column>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-main>
+        <el-footer></el-footer>
 
-            <el-table-column
-                    prop="path"
-                    label="path"
-                    sortable
-                    width="180">
-            </el-table-column>
-            <el-table-column
-                    prop="name"
-                    label="name"
-                    sortable
-                    width="180">
-            </el-table-column>
-
-            <el-table-column
-                    prop="guard_name"
-                    label="guard_name"
-                    sortable
-                    width="180">
-            </el-table-column>
-
-            <el-table-column
-                    prop="icon"
-                    label="icon"
-                    sortable
-                    width="180">
-            </el-table-column>
-            <el-table-column
-                    prop="component"
-                    label="component"
-                    sortable
-                    width="180">
-            </el-table-column>
-            <el-table-column
-                    prop="hidden"
-                    label="hidden"
-                    sortable
-                    width="180">
-            </el-table-column>
-            <el-table-column
-                    fixed="right"
-                    label="操作"
-                    width="120">
-                <template slot-scope="scope">
-                    <el-button
-                            @click.native.prevent="deleteRow(scope, tableData)"
-                            type="text"
-                            size="small">
-                        删除
-                    </el-button>
-                    <el-button
-                            @click.native.prevent="addRow(scope, tableData)"
-                            type="text"
-                            size="small">
-                        添加
-                    </el-button>
-                    <el-button
-                            @click.native.prevent="editRow(scope, tableData)"
-                            type="text"
-                            size="small">
-                        编辑
-                    </el-button>
-
-                </template>
-            </el-table-column>
-        </el-table>
 
 <!--        抽屉
 direction rtl / ltr / ttb / btt
@@ -169,7 +173,7 @@ direction rtl / ltr / ttb / btt
             </div>
         </el-drawer>
 
-    </div>
+    </el-container>
 </template>
 <script>
     import {permission_all,permission_add,permission_del} from "../../../api/permission";
@@ -186,6 +190,11 @@ direction rtl / ltr / ttb / btt
                 dialog: false,
                 loading: false,
                 selected_node:null,
+            }
+        },
+        computed:{
+            tableHeight(){
+                // return 80vw;
             }
         },
         created(){
