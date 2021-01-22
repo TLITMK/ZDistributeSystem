@@ -13,6 +13,12 @@
                     </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="getList(tableData.currentPage,tableData.per_page)"></el-button>
                 </el-input>
+
+                <el-button
+                        @click.native.prevent="addRow(scope, tableData.data)"
+                        type="primary" plain >
+                    添加
+                </el-button>
             </div>
             <el-table
                     :data="tableData.data"
@@ -49,16 +55,16 @@
                             删除
                         </el-button>
                         <el-button
-                                @click.native.prevent="addRow(scope, tableData.data)"
-                                type="text"
-                                size="small">
-                            添加
-                        </el-button>
-                        <el-button
                                 @click.native.prevent="editRow(scope, tableData.data)"
                                 type="text"
                                 size="small">
                             编辑
+                        </el-button>
+                        <el-button
+                                @click.native.prevent="getPermissions(scope, tableData.data)"
+                                type="text"
+                                size="small">
+                            设置
                         </el-button>
 
                     </template>
@@ -81,6 +87,7 @@
         <!--        抽屉
         direction rtl / ltr / ttb / btt
         -->
+<!--        抽屉  新增+编辑-->
         <el-drawer
                 :title="drawerTitle"
                 :show-close='true'
@@ -112,12 +119,43 @@
                 <el-button type="primary" @click="confirmForm()" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
             </div>
         </el-drawer>
+<!--        抽屉  分配权限-->
+        <el-drawer
+                :title="'【'+role.title+'】权限设置'"
+                :show-close='true'
+                :withHeader="true"
+                :before-close="handleClose"
+                :visible.sync="permDialog"
+                direction="ltr"
+                custom-class=""
+                ref="drawer"
+                @opened="darwOpened"
+        >
+            <div class="drawer__content">
+                <el-tree
+                        :props="{label:'title',children:'children',id:'id'}"
+                        :data="permissionData"
+                        show-checkbox
+                        default-expand-all
+                        node-key="id"
+                        ref="tree_perm"
+                        highlight-current
+                        @check-change="handleCheckChange"
+                        @click="handleNodeClick"
+                >
+                </el-tree>
+            </div>
+            <div class="drawer__footer">
+                <el-button type="danger" @click="cancelForm">关 闭</el-button>
+                <el-button type="primary" @click="setPermission()" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+            </div>
+        </el-drawer>
 
     </el-container>
 </template>
 <script>
-   import {deleteRole,editRoles,getRoles} from "../../../api/role";
-
+   import {deleteRole,editRoles,getRoles,setPermissions} from "../../../api/role";
+   import {permission_all} from "../../../api/permission";
    export default {
         name: "permission.index",
         data(){
@@ -128,6 +166,7 @@
                 formLabelWidth: '80px',
                 timer:null,
                 dialog: false,
+                permDialog:false,
                 loading: false,
                 selected_node:null,
 
@@ -135,8 +174,13 @@
                 dialogImageUrl: '',
                 dialogVisible: false,
                 disabled: false,
-                searchType:'account',
-                searchValue:''
+                searchType:'role',
+                searchValue:'',
+                isCreate:false,
+
+                permissionData:[],
+                selectIds:[],
+                role:{},
             }
         },
        computed: {
@@ -148,8 +192,39 @@
        },
         created(){
             this.getList(1,10);
+            permission_all().then(res=>{
+                this.permissionData=this.getMenu(res)
+            })
         },
         methods:{
+            setPermission(){
+                var perm_ids=this.$refs.tree_perm.getCheckedKeys();
+                var role_id=this.role.id
+
+                console.log(this.$refs.tree_perm.getCheckedKeys());
+                setPermissions({role_id:role_id,permission_ids:perm_ids}).then(res=>{
+                    if(res.err_code===0){
+                        this.$message({
+                            message: res.msg,
+                            type: 'success'
+                        });
+                        this.getList(1,10);
+                        this.permDialog=false;
+                    }
+                    else{
+                        this.$message.error(res.msg);
+                    }
+                })
+            },
+            darwOpened(){
+                this.$refs.tree_perm.setCheckedKeys( this.selectIds);
+            },
+            handleCheckChange(data, checked, indeterminate) {
+                console.log(data, checked, indeterminate);
+            },
+            handleNodeClick(data) {
+                console.log(data);
+            },
             searchClear(){
                 this.searchValue=''
                 this.getList(this.tableData.currentPage,this.tableData.per_page)
@@ -266,6 +341,40 @@
 
                 this.dialog=true;
             },
+            getPermissions(row){
+                var _this=this;
+                this.permDialog=true;
+                this.role=row.row
+                var defaultSelect=[];
+                var permissionData=this.permissionData;
+                var validPermission=row.row.permissions;
+                this.selectIds=[];
+                this.getids(permissionData,validPermission);
+                // for (let i=0;i<permissionData.length;i++){
+                //     for(let j=0;j<validPermission.length;j++){
+                //         if(permissionData[i].id===validPermission[j].id){
+                //             defaultSelect.push(permissionData[i].id)
+                //         }
+                //     }
+                // }
+                // this.selectIds=defaultSelect;
+                console.log(this.selectIds);
+
+
+            },
+            getids(all,selects,){
+                for (let i=0;i<all.length;i++){
+                    for(let j=0;j<selects.length;j++){
+                        if(all[i].id===selects[j].id){
+                            this.selectIds.push(all[i].id)
+
+                        }
+                        if(all[i].children.length>0){
+                            this.getids(all[i].children,selects);
+                        }
+                    }
+                }
+            },
 
             handleClose(done) {
                 if (this.loading) {
@@ -310,6 +419,21 @@
                         _ => {}
                     );
 
+            },
+
+            getMenu(permissions,parent_id=0,parent=null){
+                var _this=this;
+                var arr=[];
+                permissions.forEach((v,k)=>{
+                    if(v.parent_id===parent_id){
+                        v.children=_this.getMenu(permissions,v.id,v);
+                        v.parent=[];
+                        v.parent.push(parent)
+                        arr.push(v)
+                    }
+                })
+
+                return arr;
             },
 
         }

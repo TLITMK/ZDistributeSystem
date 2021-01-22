@@ -31,3 +31,11 @@ export function deleteRole(params) {
     data:params
   })
 }
+
+export function setPermissions(params){
+  return request({
+    url:'/role/set_permissions',
+    method:'post',
+    data:params
+  })
+}

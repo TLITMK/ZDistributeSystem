@@ -1,10 +1,9 @@
 import request from '@/utils/request'
 
-export function permission_all(params){
+export function permission_all(){
     return request({
         url:'/permission/all',
         method:'post',
-        params:params
     })
 }
 

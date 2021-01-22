@@ -29,6 +29,7 @@ Route::group([
     Route::post('role/list',[RoleController::class,'getList'])->name('role.index');
     Route::post('role/edit',[RoleController::class,'edit'])->name('role.edit');
     Route::post('role/del',[RoleController::class,'del'])->name('role.del');
+    Route::post('role/set_permissions',[RoleController::class,'setPermission'])->name('role.set_permissions');
 
 
 

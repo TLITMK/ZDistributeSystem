@@ -7,19 +7,21 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
     public function getList(Request $request){
         $count=$request->input('pageSize',10);
 
-        $list=\DB::table('roles')
-            ->where(function($query)use($request){
+        $list=Role::where(function($query)use($request){
                 $searchType=$request->input('searchType',false);
                 $searchValue=$request->input('searchValue',false);
                 if($searchType&&$searchValue)
                     $query->where($searchType,'like','%'.$searchValue.'%');
             })
+            ->with('permissions')
             ->paginate($count);
         return response()->json($list);
     }
@@ -110,5 +112,37 @@ class RoleController extends Controller
             'msg'=>'删除成功',
             'data'=>''
         ]);
+    }
+    public function setPermission(Request $request){
+        try{
+            $request->validate([
+                'permission_ids'=>'required|array',
+                'role_id'=>'required|numeric'
+            ]);
+        }catch (ValidationException $e){
+            return response()->json([
+                'err_code'=>200,
+                'msg'=>$this->ValidateMsg($e),
+            ]);
+        }
+        try{
+            $ids=$request->input('permission_ids');
+            $role_id=$request->input('role_id');
+            $role=Role::where('id',$role_id)->first();
+            $permissions=Permission::whereIn('id',$ids)->get();
+            $rt=$role->syncPermissions($permissions);
+        }catch (\Throwable $e){
+            return response()->json([
+                'err_code'=>500,
+                'msg'=>$e->getMessage(),
+                'data'=>$e->getTrace()
+            ]);
+        }
+        return response()->json([
+            'err_code'=>0,
+            'msg'=>'设置成功',
+            'role'=>$rt
+        ]);
+
     }
 }
