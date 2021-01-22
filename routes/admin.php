@@ -25,6 +25,7 @@ Route::group([
     Route::post('user/admin_edit',[UserController::class,'admin_edit'])->name('permission.admin_edit');
     Route::post('user/admin_del',[UserController::class,'admin_del'])->name('permission.admin_del');
     Route::post('user/admin_upload_avatar',[UserController::class,'admin_upload_avatar'])->name('permission.admin_upload_avatar');
+    Route::post('user/set_roles',[UserController::class,'setRoles'])->name('permission.set_roles');
 
     Route::post('role/list',[RoleController::class,'getList'])->name('role.index');
     Route::post('role/edit',[RoleController::class,'edit'])->name('role.edit');

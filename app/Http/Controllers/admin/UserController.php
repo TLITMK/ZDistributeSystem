@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -93,8 +94,15 @@ class UserController extends Controller
             if($searchValue&&$searchType)
                 $query->where($searchType,'like','%'.$searchValue.'%');
 
-        })->paginate($count);
-        return response()->json($list);
+        })->with('roles')
+            ->paginate($count);
+        foreach ($list as &$v){
+            $v->role_str='';
+            foreach ($v->roles as $role){
+                $v->role_str.=$role->title.'|';
+            }
+        }
+        return response()->json($list->toArray());
     }
 
     public function admin_edit(Request $request){
@@ -230,6 +238,39 @@ class UserController extends Controller
             'err_code'=>0,
             'msg'=>'上传成功',
             'data'=>$path
+        ]);
+    }
+
+    public function setRoles(Request $request){
+        try{
+            $request->validate([
+                'user_id'=>'required|numeric',
+                'role_ids'=>'required|array'
+            ]);
+        }catch (ValidationException $e){
+            return response()->json([
+                'err_code'=>200,
+                'msg'=>$this->ValidateMsg($e),
+            ]);
+        }
+
+        try{
+            $ids=$request->input('role_ids');
+            $user_id=$request->input('user_id');
+            $user=User::where('id',$user_id)->first();
+            $roles=Role::whereIn('id',$ids)->get();
+            $rt=$user->assignRole($roles);
+        }catch (\Throwable $e){
+            return response()->json([
+                'err_code'=>500,
+                'msg'=>$e->getMessage(),
+                'data'=>$e->getTrace()
+            ]);
+        }
+        return response()->json([
+            'err_code'=>0,
+            'msg'=>'设置成功',
+            'role'=>$rt
         ]);
     }
 }

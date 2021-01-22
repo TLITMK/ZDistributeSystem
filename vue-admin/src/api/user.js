@@ -54,6 +54,16 @@ export function user_admin_del(params){
   })
 }
 
+
+export function user_admin_set_roles(params){
+  return request({
+    url:'/user/set_roles',
+    method:'post',
+    data:params
+  })
+}
+
+
 export function user_admin_upload_avatar(params){
   let config = {
     headers: {
@@ -62,5 +72,7 @@ export function user_admin_upload_avatar(params){
   }
   return axios.post('/user/admin_upload_avatar',params,config)
 }
+
+
 
 

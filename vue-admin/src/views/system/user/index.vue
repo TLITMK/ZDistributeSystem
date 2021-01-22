@@ -14,6 +14,11 @@
                     </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="getList(tableData.currentPage,tableData.per_page)"></el-button>
                 </el-input>
+                <el-button
+                        @click.native.prevent="addRow(scope, tableData.data)"
+                        type="primary" plain >
+                    添加
+                </el-button>
             </div>
             <el-table
                     :data="tableData.data"
@@ -70,6 +75,12 @@
                         {{scope.row.developer?'是':'否'}}
                     </template>
                 </el-table-column>
+                <el-table-column
+                        prop="role_str"
+                        label="角色"
+                        sortable>
+
+                </el-table-column>
 
                 <el-table-column
                         prop="signature"
@@ -88,16 +99,16 @@
                             删除
                         </el-button>
                         <el-button
-                                @click.native.prevent="addRow(scope, tableData.data)"
-                                type="text"
-                                size="small">
-                            添加
-                        </el-button>
-                        <el-button
                                 @click.native.prevent="editRow(scope, tableData.data)"
                                 type="text"
                                 size="small">
                             编辑
+                        </el-button>
+                        <el-button
+                                @click.native.prevent="getPermissions(scope, tableData.data)"
+                                type="text"
+                                size="small">
+                            设置
                         </el-button>
 
                     </template>
@@ -186,11 +197,42 @@
                 <el-button type="primary" @click="confirmForm()" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
             </div>
         </el-drawer>
+        <el-drawer
+                :title="'【'+user.name+'】角色分配'"
+                :show-close='true'
+                :withHeader="true"
+                :before-close="handleClose"
+                :visible.sync="permDialog"
+                direction="ltr"
+                custom-class=""
+                ref="drawer"
+                @opened="darwOpened"
+        >
+            <div class="drawer__content">
+                <el-tree
+                        :props="{label:'title',children:'children',id:'id'}"
+                        :data="permissionData"
+                        show-checkbox
+                        default-expand-all
+                        node-key="id"
+                        ref="tree_perm"
+                        highlight-current
+                        @check-change="handleCheckChange"
+                        @click="handleNodeClick"
+                >
+                </el-tree>
+            </div>
+            <div class="drawer__footer">
+                <el-button type="danger" @click="cancelForm">关 闭</el-button>
+                <el-button type="primary" @click="setPermission()" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+            </div>
+        </el-drawer>
 
     </el-container>
 </template>
 <script>
-   import {user_admin_list,user_admin_edit,user_admin_upload_avatar,user_admin_del} from "../../../api/user";
+   import {user_admin_list,user_admin_edit,user_admin_upload_avatar,user_admin_del,user_admin_set_roles} from "../../../api/user";
+   import {getRoles} from "../../../api/role";
 
    export default {
         name: "permission.index",
@@ -211,7 +253,11 @@
                 disabled: false,
                 isCreate:false,
                 searchType:'account',
-                searchValue:''
+                searchValue:'',
+
+                permDialog:false,
+                permissionData:[],
+                user:{}
             }
         },
        computed: {
@@ -223,8 +269,62 @@
        },
         created(){
             this.getList(1,20);
+            getRoles({}).then(res=>{
+                this.permissionData=res.data
+            })
         },
         methods:{
+            darwOpened(){
+                this.$refs.tree_perm.setCheckedKeys( this.selectIds);
+            },
+            handleCheckChange(data, checked, indeterminate) {
+                console.log(data, checked, indeterminate);
+            },
+            handleNodeClick(data) {
+                console.log(data);
+            },
+            getPermissions(row){
+                var _this=this;
+                this.permDialog=true;
+                this.user=row.row
+                var defaultSelect=[];
+                var permissionData=this.permissionData;
+                var validPermission=row.row.roles;
+                this.selectIds=[];
+                for (let i=0;i<permissionData.length;i++){
+                    for(let j=0;j<validPermission.length;j++){
+                        if(permissionData[i].id===validPermission[j].id){
+                            defaultSelect.push(permissionData[i].id)
+                        }
+                    }
+                }
+                this.selectIds=defaultSelect;
+                console.log(this.selectIds);
+            },
+            setPermission(){
+                var perm_ids=this.$refs.tree_perm.getCheckedKeys();
+                var user_id=this.user.id
+
+                console.log(this.$refs.tree_perm.getCheckedKeys());
+                var params={'user_id':user_id,role_ids:perm_ids};
+                user_admin_set_roles(params).then(res=>{
+                    if(res.err_code===0){
+                        this.$message({
+                            message: res.msg,
+                            type: 'success'
+                        });
+                        this.getList(1,10);
+                        this.permDialog=false;
+                    }
+                    else{
+                        this.$message.error(res.msg);
+                    }
+                })
+            },
+
+
+
+
             searchClear(){
                 this.searchValue=''
                 this.getList(this.tableData.currentPage,this.tableData.per_page)
