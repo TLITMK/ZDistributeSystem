@@ -173,6 +173,7 @@ export default {
             .then(() => {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
+              this.$message
             })
             .catch(() => {
               this.loading = false

@@ -71,8 +71,13 @@ service.interceptors.response.use(
     },
     error => {
       endLoading();
-      console.log('err' + error) // for debug
+      console.log('err' , error.response) // for debug
       if (error.response && error.response.status == 401) {
+        Message({
+          message: error.response.data.message,
+          type: 'error',
+          duration: 5 * 1000
+        })
         store.dispatch('logout');
         if(router.currentRoute.name != "/login"){
           router.push({
@@ -83,6 +88,8 @@ service.interceptors.response.use(
           });
         }else{
           router.push('/login');
+
+
         }
       } else {
         Message({

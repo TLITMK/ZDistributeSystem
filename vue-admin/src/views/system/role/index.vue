@@ -142,6 +142,8 @@
                         highlight-current
                         @check-change="handleCheckChange"
                         @click="handleNodeClick"
+                        check-strictly
+                        check-descendants
                 >
                 </el-tree>
             </div>
@@ -199,6 +201,8 @@
         methods:{
             setPermission(){
                 var perm_ids=this.$refs.tree_perm.getCheckedKeys();
+                var perm_ids1=this.$refs.tree_perm.getHalfCheckedKeys();
+                perm_ids=perm_ids.concat(perm_ids1)
                 var role_id=this.role.id
 
                 console.log(this.$refs.tree_perm.getCheckedKeys());
@@ -220,7 +224,7 @@
                 this.$refs.tree_perm.setCheckedKeys( this.selectIds);
             },
             handleCheckChange(data, checked, indeterminate) {
-                console.log(data, checked, indeterminate);
+                console.log(data.title, checked, indeterminate);
             },
             handleNodeClick(data) {
                 console.log(data);
