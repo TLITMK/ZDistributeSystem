@@ -6,7 +6,7 @@ use App\Http\Controllers\admin\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\admin\UserController;
 
 Route::post('login', [UserController::class, 'login'])->name('admin.api.login');
 
