@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('test',function(Request $request){
+    info('test');
     return response()->json([
         'code'=>'test'
     ]);
