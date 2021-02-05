@@ -19,5 +19,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('test',function(Request $request){
-    return $request->all();
+    dd($request->all());
 });
