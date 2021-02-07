@@ -14,3 +14,5 @@ grant all privileges on *.* to 'root'@'%' identified by '718040Ti!' with grant o
 flush privileges;
 
 php artisan migrate --seed
+
+php artisan storage:link
