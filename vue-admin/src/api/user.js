@@ -64,13 +64,22 @@ export function user_admin_set_roles(params){
 }
 
 
+
 export function user_admin_upload_avatar(params){
-  let config = {
+  return request({
+    url:'/user/admin_upload_avatar',
+    method:'post',
+    data:params,
     headers: {
       'Content-Type': 'multipart/form-data'
     }
-  }
-  return axios.post('/user/admin_upload_avatar',params,config)
+  })
+  // let config = {
+  //   headers: {
+  //     'Content-Type': 'multipart/form-data'
+  //   }
+  // }
+  // return axios.post('/user/admin_upload_avatar',params,config)
 }
 
 
