@@ -13,6 +13,8 @@ mysql
 grant all privileges on *.* to 'root'@'%' identified by '718040Ti!' with grant option;
 flush privileges;
 
-php artisan migrate --seed
+php artisan migrate  
+
+初始数据从从测试服复制导入
 
 php artisan storage:link
