@@ -114,7 +114,10 @@ class PermissionController extends Controller
             ]);
         }
         try{
-            \DB::table('permissions')->delete($id);
+            \DB::table('permissions')
+                ->where('id',$id)
+                ->orWhere('parent_id',$id)
+                ->delete();
         }catch (\Throwable $e){
             return response()->json([
                 'err_code'=>500,
