@@ -19,5 +19,25 @@ class Controller extends BaseController
         }
     }
 
+    function _response($code,$msg,$data){
+        return response()->json([
+            'err_code'=>$code,
+            'msg'=>$msg,
+            'data'=>$data
+        ]);
+    }
+
+    function random_account(){
+        $pattern = '1234567890abcdefghijklmnopqrstuvwxyz 
+               ABCDEFGHIJKLOMNOPQRSTUVWXYZ';
+        $key='_temp_';
+        for($i=0;$i<12;$i++)
+        {
+            $key .= $pattern{mt_rand(0,35)};    //生成php随机数
+        }
+        return $key;
+
+    }
+
 
 }
